@@ -1,0 +1,707 @@
+---
+title: "Healthcare Analysis"
+author: Charley Dublin Jr.
+date: June 2024
+format:
+  html: 
+    theme: sandstone
+    fontsize: .85em
+    linestretch: 1.5
+    toc: true
+    toc-expand: 2
+    toc-location: body
+    toc-title: Table of Contents
+  pdf:
+    documentclass: scrreprt
+execute:
+  echo: false
+  warning: false
+---
+
+```{r Clear Environment & Load Libraries, warning = FALSE}
+
+# Clear environment
+rm(list = ls())
+
+# Load necessary libraries
+library(tidyverse)
+library(tidymodels)
+#library(DataExplorer)
+library(ggcorrplot)
+library(gt)
+library(gtsummary)
+library(multilevelmod)
+library(car)
+library(MASS)
+library(skimr)
+library(prophet)
+library(report)
+library(flextable)
+library(sjPlot)
+library(lme4)
+
+# New libraries for analyzing the models
+library(performance)
+library(ggeffects)
+#library(gtsummary)
+library(emmeans)
+library(effectsize)
+library(vip)
+library(randomForest)
+#library(rJava)
+library(glmulti) # Had to install java directly
+#library(insight)
+#library(ggstatsplot)
+library(modelsummary)
+library(DataExplorer)
+library(echarts4r)
+library(conflicted)
+
+  conflicts_prefer(
+    ggplot2::annotate
+#    dplyr::filter,
+#    dplyr::lag,
+#    dplyr::select,
+#    dplyr::mutate(),
+#    dplyr::summarize(),
+##    dplyr::summarise(),
+#    dplyr::arrange()
+  )
+
+tidymodels_prefer()
+theme_set(theme_bw(base_size=10))
+
+My_Theme_Horizontal = theme(
+        axis.text.x = element_text(color = "grey20", size = 6, angle = 90, hjust = .5, vjust = .5, face = "plain"),
+        axis.text.y = element_text(color = "grey20", size = 6, angle = 0, hjust = 1, vjust = 0, face = "plain"),  
+        axis.title.x = element_text(color = "grey20", size = 8, angle = 0, hjust = .5, vjust = 0, face = "bold"),
+        axis.title.y = element_text(color = "grey20", size = 8, angle = 90, hjust = .5, vjust = .5, face = "bold")
+  )
+
+
+#library(chatgpt)
+
+# R For Marketing Code & Data - Great resource
+#http://r-marketing.r-forge.r-project.org
+# Exploratory Factor Analysis:
+#http://r-marketing.r-forge.r-project.org/Instructor/Intro%20Factor%20Analysis/intro-factor-analysis.pdf
+
+
+```
+
+```{r Load healthcare Data}
+
+# Load your data
+# Replace "your_data" with the name of your dataset
+
+healthcare_data <- read.csv("~/Desktop/HealthCare/fetal_health.csv", header = T)
+
+#Source:https://www.kaggle.com/code/karnikakapoor/fetal-health-classification/notebook
+
+
+clean_healthcare_data <- as.data.frame(scale(healthcare_data, center=TRUE, scale=TRUE))
+
+# healthcare_data <- healthcare_data %>% separate_wider_delim(campaign_name, delim = "_", names = c("Channel", "Channel_Type"), cols_remove = FALSE)
+# 
+# healthcare_data <- healthcare_data %>% mutate(across(where(is.character), toupper),
+#                                 c_date = as.Date(c_date),
+#                                 campaign_id = as.factor(campaign_id),
+#                                 campaign_name = as.factor(campaign_name),
+#                                 category = as.factor(category),
+#                                 Channel = as.factor(Channel),
+#                                 Channel_Type = as.factor(Channel_Type)
+#                                 )
+
+
+
+```
+
+# Health Care Analysis
+
+## Fetal Health Care (FHC)
+
+### Overview of FHC[^1]
+
+[^1]: Source: <https://www.kaggle.com/code/karnikakapoor/fetal-health-classification/notebook>
+
+A cardiotocogram (CTG) is a technical recording of the fetal heartbeat and uterine contractions during pregnancy. It is primarily used in obstetrics to monitor the well-being of the fetus during the third trimester of pregnancy and during labor.
+
+The CTG provides important information about the fetal heart rate (FHR) and its response to uterine contractions, which helps healthcare providers assess the fetal condition and detect any signs of fetal distress.
+
+**Key Components of a CTG:**
+
+**Fetal Heart Rate (FHR):**
+
+[Baseline Rate:]{.underline}
+
+The average heart rate of the fetus, usually measured over a period of 10 minutes. A normal baseline FHR is between 110 and 160 beats per minute (bpm).
+
+[Variability:]{.underline}
+
+Fluctuations in the baseline FHR, which indicate the health and responsiveness of the fetal autonomic nervous system.
+
+[Accelerations:]{.underline}
+
+Temporary increases in FHR, typically associated with fetal movements. Accelerations are generally a positive sign, indicating good fetal well-being.
+
+[Decelerations:]{.underline}
+
+Temporary decreases in FHR. These can be benign or indicate potential issues, depending on their timing, duration, and relationship to uterine contractions.
+
+**Uterine Contractions:**
+
+The frequency, duration, and intensity of uterine contractions are recorded. This helps in assessing the labor progress and the fetal response to the contractions.
+
+**Types of Monitoring:**
+
+[External CTG:]{.underline}
+
+Uses external sensors placed on the mother's abdomen to monitor the FHR and uterine contractions. It is non-invasive and commonly used during prenatal visits and early labor.
+
+[Internal CTG:]{.underline}
+
+Involves placing an electrode on the fetal scalp and a pressure catheter inside the uterus. This method provides more accurate data but is invasive and typically used when closer monitoring is needed during labor.
+
+**Interpretation:**
+
+Healthcare providers analyze the CTG to assess fetal well-being. They look at the baseline FHR, variability, accelerations, and decelerations. The patterns observed can help in determining if the fetus is in distress and if any interventions, such as changes in maternal position, oxygen administration, or expedited delivery, are needed.
+
+**Importance of CTG:**
+
+[Detection of Fetal Distress:]{.underline}
+
+Helps identify signs of hypoxia (lack of oxygen) or other issues that may compromise fetal health.
+
+[Labor Management:]{.underline}
+
+Assists in making informed decisions about labor progress and interventions.
+
+[Reassurance:]{.underline}
+
+Provides reassurance to expectant mothers when the fetal heart rate and patterns are normal.
+
+Overall, a cardiotocogram is a crucial tool in prenatal care and labor management, helping ensure the safety and health of both the mother and the baby.
+
+### **Dataset**
+
+This dataset contains 2126 records of features extracted from Cardiotocogram exams, which were then classified by expert obstetrician into 3 classes:
+
+1 - Normal
+
+2 - Suspect
+
+3 - Pathological
+
+*Features:*
+
+**'baseline value'** - FHR baseline (beats per minute)
+
+**'accelerations'** - Number of accelerations per second
+
+**'fetal_movement'** - Number of fetal movements per second
+
+**'uterine_contractions'** - Number of uterine contractions per second
+
+**'light_decelerations'** - Number of light decelerations per second
+
+**'severe_decelerations'** - Number of severe decelerations per second
+
+**'prolongued_decelerations'** - Number of prolonged decelerations per second
+
+**'abnormal_short_term_variability'** - Percentage of time with abnormal short term variability
+
+**'mean_value_of_short_term_variability'** - Mean value of short term variability
+
+**'percentage_of_time_with_abnormal_long_term_variability' -** Percentage of time with abnormal long term variability
+
+**'mean_value_of_long_term_variability'** - Mean value of long term variability
+
+**'histogram_width'** - Width of FHR histogram
+
+**'histogram_min'** - Minimum (low frequency) of FHR histogram
+
+**'histogram_max'** - Maximum (high frequency) of FHR histogram
+
+**'histogram_number_of_peaks'** - Number of histogram peaks
+
+**'histogram_number_of_zeroes' -** Number of histogram zeros
+
+**'histogram_mode'** - Histogram mode
+
+**'histogram_mean'** - Histogram mean
+
+**'histogram_median' -** Histogram median
+
+**'histogram_variance'** - Histogram variance
+
+**'histogram_tendency'** - Histogram tendency
+
+[**Target Outcome Variable is 'Fetal Health'**]{.underline}
+
+**'fetal_health'** Tagged as ***1 (Normal), 2 (Suspect) and 3 (Pathological)***
+
+### **Exploratory Data Analysis**
+
+### 
+
+```{r EDA of fetal data set}
+
+#summary(healthcare_data) 
+
+table(healthcare_data$fetal_health)
+datasummary_skim(healthcare_data)
+
+#plot(healthcare_data$severe_decelerations)
+
+```
+
+
+```{r EDA Key Plots}
+
+healthcare_data %>% 
+group_by(fetal_health) %>%
+ggplot(aes(x=as.factor(fetal_health), y=baseline.value)) + 
+  labs(x ="Fetal Health", 
+       y="Baseline Hearbeat", 
+       title="Fetal Health - Evaluate Baseline Heartbeat",
+       subtitle="Source: Kaggle")+
+      geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.alpha = 0.2)+
+    # scale_y_continuous(breaks = seq(0, 300, by = 30))+
+     geom_hline(aes(yintercept = 110), color="green")+ #annotate("text",y=30,x=1, label="30", collor="green")+
+     geom_hline(aes(yintercept = 160), color="green")+
+    # geom_hline(aes(yintercept = 90), color="red")+
+  My_Theme_Horizontal 
+
+healthcare_data %>% 
+group_by(fetal_health) %>%
+ggplot(aes(x=as.factor(fetal_health), y=accelerations)) + 
+  labs(x ="Fetal Health", 
+       y="Accelerations", 
+       title="Fetal Health - Evaluate Accelerations",
+       subtitle="Source: Kaggle")+
+      geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.alpha = 0.2)+
+    # scale_y_continuous(breaks = seq(0, 300, by = 30))+
+     # geom_hline(aes(yintercept = 110), color="green")+ #annotate("text",y=30,x=1, label="30", collor="green")+
+     # geom_hline(aes(yintercept = 160), color="green")+
+    # geom_hline(aes(yintercept = 90), color="red")+
+  My_Theme_Horizontal 
+
+
+healthcare_data %>% 
+group_by(fetal_health) %>%
+ggplot(aes(x=as.factor(fetal_health), y=fetal_movement)) + 
+  labs(x ="Fetal Health", 
+       y="Fetal Movement", 
+       title="Fetal Health - Evaluate Fetal Movement",
+       subtitle="Source: Kaggle")+
+      geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.alpha = 0.2)+
+    # scale_y_continuous(breaks = seq(0, 300, by = 30))+
+     # geom_hline(aes(yintercept = 110), color="green")+ #annotate("text",y=30,x=1, label="30", collor="green")+
+     # geom_hline(aes(yintercept = 160), color="green")+
+    # geom_hline(aes(yintercept = 90), color="red")+
+  My_Theme_Horizontal 
+
+healthcare_data %>% 
+group_by(fetal_health) %>%
+ggplot(aes(x=as.factor(fetal_health), y=uterine_contractions)) + 
+  labs(x ="Fetal Health", 
+       y="Uterine Contractions", 
+       title="Fetal Health - Evaluate Uterine Contractions",
+       subtitle="Source: Kaggle")+
+      geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.alpha = 0.2)+
+    # scale_y_continuous(breaks = seq(0, 300, by = 30))+
+     # geom_hline(aes(yintercept = 110), color="green")+ #annotate("text",y=30,x=1, label="30", collor="green")+
+     # geom_hline(aes(yintercept = 160), color="green")+
+    # geom_hline(aes(yintercept = 90), color="red")+
+  My_Theme_Horizontal 
+
+healthcare_data %>% 
+group_by(fetal_health) %>%
+ggplot(aes(x=as.factor(fetal_health), y=light_decelerations)) + 
+  labs(x ="Fetal Health", 
+       y="Light Decelerations", 
+       title="Fetal Health - Evaluate Light Decelerations",
+       subtitle="Source: Kaggle")+
+      geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.alpha = 0.2)+
+    # scale_y_continuous(breaks = seq(0, 300, by = 30))+
+     # geom_hline(aes(yintercept = 110), color="green")+ #annotate("text",y=30,x=1, label="30", collor="green")+
+     # geom_hline(aes(yintercept = 160), color="green")+
+    # geom_hline(aes(yintercept = 90), color="red")+
+  My_Theme_Horizontal 
+
+healthcare_data %>% 
+group_by(fetal_health) %>%
+ggplot(aes(x=as.factor(fetal_health), y=prolongued_decelerations)) + 
+  labs(x ="Fetal Health", 
+       y="Prolonged Decelerations", 
+       title="Fetal Health - Evaluate Prolonged Decelerations",
+       subtitle="Source: Kaggle")+
+      geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.alpha = 0.2)+
+    # scale_y_continuous(breaks = seq(0, 300, by = 30))+
+     # geom_hline(aes(yintercept = 110), color="green")+ #annotate("text",y=30,x=1, label="30", collor="green")+
+     # geom_hline(aes(yintercept = 160), color="green")+
+    # geom_hline(aes(yintercept = 90), color="red")+
+  My_Theme_Horizontal 
+
+
+healthcare_data %>% 
+group_by(fetal_health) %>%
+ggplot(aes(x=as.factor(fetal_health), y=abnormal_short_term_variability)) + 
+  labs(x ="Fetal Health", 
+       y="Abnormal Short Term Variability", 
+       title="Fetal Health - Evaluate Abnormal ST Variability",
+       subtitle="Source: Kaggle")+
+      geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.alpha = 0.2)+
+    # scale_y_continuous(breaks = seq(0, 300, by = 30))+
+     # geom_hline(aes(yintercept = 110), color="green")+ #annotate("text",y=30,x=1, label="30", collor="green")+
+     # geom_hline(aes(yintercept = 160), color="green")+
+    # geom_hline(aes(yintercept = 90), color="red")+
+  My_Theme_Horizontal 
+
+healthcare_data %>% 
+group_by(fetal_health) %>%
+ggplot(aes(x=as.factor(fetal_health), y=mean_value_of_short_term_variability)) + 
+  labs(x ="Fetal Health", 
+       y="Abnormal Mean Short Term Variability", 
+       title="Fetal Health - Evaluate Mean Abnormal ST Variability",
+       subtitle="Source: Kaggle")+
+      geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.alpha = 0.2)+
+    # scale_y_continuous(breaks = seq(0, 300, by = 30))+
+     # geom_hline(aes(yintercept = 110), color="green")+ #annotate("text",y=30,x=1, label="30", collor="green")+
+     # geom_hline(aes(yintercept = 160), color="green")+
+    # geom_hline(aes(yintercept = 90), color="red")+
+  My_Theme_Horizontal 
+
+healthcare_data %>% 
+group_by(fetal_health) %>%
+ggplot(aes(x=as.factor(fetal_health), y=mean_value_of_long_term_variability)) + 
+  labs(x ="Fetal Health", 
+       y="Abnormal Long Term Variability", 
+       title="Fetal Health - Evaluate Mean Abnormal LT Variability",
+       subtitle="Source: Kaggle")+
+      geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.alpha = 0.2)+
+    # scale_y_continuous(breaks = seq(0, 300, by = 30))+
+     # geom_hline(aes(yintercept = 110), color="green")+ #annotate("text",y=30,x=1, label="30", collor="green")+
+     # geom_hline(aes(yintercept = 160), color="green")+
+    # geom_hline(aes(yintercept = 90), color="red")+
+  My_Theme_Horizontal 
+
+
+
+```
+
+Deeper Dive Into FHR
+
+```{r}
+
+fhr_data <- healthcare_data %>% 
+pivot_longer(starts_with("histogram"), names_to = "FHR_Measure", values_to = "FHR_Values")
+
+median_normal <- fhr_data %>% group_by(fetal_health) %>%
+  summarize(normal_mean = mean(baseline.value),
+            normal_median = median(baseline.value)) %>%
+  filter(fetal_health == 1)
+
+
+fhr_data %>%
+  filter(FHR_Measure %in% c("histogram_width", "histogram_mode", "histogram_median", "histogram_mean", "histogram_variance")) %>%
+ggplot(aes(x=as.factor(FHR_Measure), y=FHR_Values)) + 
+  labs(x ="Fetal Health Measure", 
+       y="FHR Values", 
+       title="Fetal Health - Evaluate Fetal Heartbeat Measures",
+       subtitle="Lines are normal range (yellow) and mean of healthy fetus; Source: Kaggle")+
+      geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.alpha = 0.2)+
+     geom_hline(aes(yintercept = 110), color="yellow")+ #annotate("text",y=30,x=1, label="30", collor="green")+
+     geom_hline(aes(yintercept = 160), color="yellow")+
+     geom_hline(aes(yintercept = median_normal$normal_mean), color="green")+
+  My_Theme_Horizontal+
+  facet_wrap(~fetal_health)
+
+
+
+```
+
+
+**Correlation Analysis**
+
+```{r Basic Correlation Analysis}
+
+library(corrplot)
+corr_matrix <- 
+  healthcare_data %>% select(!starts_with("histogram"))%>%
+  select_if(is.numeric) %>% 
+  cor(method="pearson", use="pairwise.complete.obs")
+
+#wb = c('white', 'black')
+
+corrplot(corr_matrix,
+ #        col = wb,
+         tl.pos = 'd',
+         tl.cex = .5, 
+         number.cex = .7,
+         method = 'color', 
+         order='AOE',
+         addCoefasPercent = TRUE,  
+         addCoef.col = "grey",
+         )
+
+
+
+```
+
+Key Findings:
+
+-   Fetal Health gets worse (score goes up) as 'abnormal short term variability', 'percentage of time with abornmal long term variability', and 'prolonged decelerations' goes up (positively correlated).
+
+-   Fetal Health gets better ('fetal health' score goes down) as 'accelerations' and 'uterine contractions' go up (negatively correlated).
+
+-   There appears to be significant colinearity in this data set.
+
+### Multinomial Logistic Regression
+
+```{r}
+
+
+require(nnet)
+
+clean_healthcare_data$fetal_health <- as.factor(healthcare_data$fetal_health)
+clean_healthcare_data$fetal_health <- relevel(clean_healthcare_data$fetal_health, ref = "1")
+  
+data_split_fh <- initial_split(clean_healthcare_data, prop = 0.7, strata = fetal_health)
+data_train_fh <- training(data_split_fh)
+data_test_fh <- testing(data_split_fh)
+
+base_model <- multinom(fetal_health ~ ., data = data_train_fh)
+summary(base_model)
+
+model2 <- multinom(fetal_health ~ baseline.value + accelerations + fetal_movement + light_decelerations + severe_decelerations + uterine_contractions  + prolongued_decelerations + abnormal_short_term_variability + percentage_of_time_with_abnormal_long_term_variability, data = data_train_fh)
+summary(model2)
+
+model3 <- multinom(fetal_health ~ baseline.value + accelerations + fetal_movement + uterine_contractions+ prolongued_decelerations + abnormal_short_term_variability + percentage_of_time_with_abnormal_long_term_variability, data = data_train_fh)
+
+summary(model3)
+
+
+models <- list("Model1" <- base_model,
+            "Model2" <- model2,
+            "Model3" <- model3)
+
+modelsummary(models,
+             statistic = "conf.int",
+             conf_level = .99,
+             fmt = 1,
+             title = "Analyzing Linear Regression Model",
+             output="markdown")
+
+#datasummary_correlation(clean_data, output="markdown")
+
+modelplot(models)
+
+prediction_fh_base <- predict(base_model, data=data_train_fh, type="class")
+
+prediction_fh2 <- predict(model2, data=data_train_fh, type="class")
+
+prediction_fh3 <- predict(model3, data=data_train_fh, type="class")
+
+set.seed(123)
+data_train_fh$pred_base <- prediction_fh_base
+data_train_fh$pred_model2 <- prediction_fh2
+data_train_fh$pred_model3 <- prediction_fh3
+
+bm_tab <- table(Actual = data_train_fh$fetal_health, Predicted = data_train_fh$pred_base)
+
+sum(diag(bm_tab))/sum(bm_tab)
+
+m2_tab <- table(Actual = data_train_fh$fetal_health, Predicted = data_train_fh$pred_model2)
+sum(diag(m2_tab))/sum(m2_tab)
+
+m3_tab <- table(Actual = data_train_fh$fetal_health, Predicted = data_train_fh$pred_model3)
+sum(diag(m3_tab))/sum(m3_tab)
+
+
+
+model3_test <- multinom(fetal_health ~ baseline.value + accelerations + fetal_movement + uterine_contractions+ prolongued_decelerations + abnormal_short_term_variability + percentage_of_time_with_abnormal_long_term_variability, data = data_test_fh)
+
+summary(model3_test)
+
+prediction_fh3_test <- predict(model3_test, data=data_test_fh, type="class")
+
+data_test_fh$pred <- prediction_fh3_test
+
+
+m3_tab_test <- table(Actual = data_test_fh$fetal_health, Predicted = data_test_fh$pred)
+sum(diag(m3_tab_test))/sum(m3_tab_test)
+
+```
+
+
+### Random Forest
+
+```{r Random Forest on FHR}
+
+#clean_healthcare_data$fetal_health <- as.factor(healthcare_data$fetal_health)
+
+#clean_healthcare_data$fetal_health <- relevel(clean_healthcare_data$fetal_health, ref = "1")
+
+clean_healthcare_data$fetal_health <- as.factor(healthcare_data$fetal_health)
+clean_healthcare_data$fetal_health <- relevel(clean_healthcare_data$fetal_health, ref = "1")
+
+set.seed(567)
+data_split_fh <- initial_split(clean_healthcare_data, prop = 0.5, strata = fetal_health)
+data_train_fh <- training(data_split_fh)
+data_test_fh <- testing(data_split_fh)
+
+
+rf_model <- 
+  rand_forest(trees = 1000, min_n = 5) %>% 
+  set_engine("ranger", verbose = TRUE) %>% 
+  set_mode("classification") 
+
+
+rf_form_fit <- 
+  rf_model %>% 
+  # Recall that Sale_Price has been pre-logged
+  fit(fetal_health ~ baseline.value + 
+        accelerations + 
+        fetal_movement + 
+        uterine_contractions+ 
+        prolongued_decelerations + 
+        abnormal_short_term_variability + 
+        percentage_of_time_with_abnormal_long_term_variability, data = data_train_fh)
+
+
+model_res <- 
+  rf_form_fit %>% 
+  extract_fit_engine() %>% 
+  summary()
+
+#rf_data_test <- factor(rf_data_test, levels=levels(rf_data_train))
+
+rf_predict <- predict(rf_form_fit, new_data=data_train_fh)
+
+# Training Data Validation
+data_train_fh$pred <- rf_predict$.pred_class
+
+rf_tab_train <- table(Actual = data_train_fh$fetal_health, Predicted = data_train_fh$pred)
+
+sum(diag(rf_tab_train))/sum(rf_tab_train)
+
+# Testing Data Validation
+
+rf_predict_test <- predict(rf_form_fit, new_data = data_test_fh)
+
+#summary(rf_predict)
+
+data_test_fh$Prediction <- rf_predict_test$.pred_class
+
+rf_tab_test <- table(Actual = data_train_fh$fetal_health, Predicted = data_train_fh$pred)
+
+sum(diag(rf_tab_test))/sum(rf_tab_test)
+
+
+
+```
+
+
+### Random Forest - Parsimonious
+
+
+```{r}
+#clean_healthcare_data$fetal_health <- as.factor(healthcare_data$fetal_health)
+#clean_healthcare_data$fetal_health <- relevel(clean_healthcare_data$fetal_health, ref = "1")
+
+rf_model <- 
+  rand_forest(trees = 1000, min_n = 5) %>% 
+  set_engine("ranger", verbose = TRUE) %>% 
+  set_mode("classification") 
+
+
+rf_form_fit <- 
+  rf_model %>% 
+  # Recall that Sale_Price has been pre-logged
+  fit(fetal_health ~ baseline.value + 
+        accelerations + 
+        fetal_movement + 
+        uterine_contractions+ 
+        prolongued_decelerations, data = data_train_fh)
+
+
+model_res <- 
+  rf_form_fit %>% 
+  extract_fit_engine() %>% 
+  summary()
+
+#rf_data_test <- factor(rf_data_test, levels=levels(rf_data_train))
+
+rf_predict <- predict(rf_form_fit, new_data=data_train_fh)
+
+# Training Data Validation
+data_train_fh$pred <- rf_predict$.pred_class
+
+rf_tab_train <- table(Actual = data_train_fh$fetal_health, Predicted = data_train_fh$pred)
+
+sum(diag(rf_tab_train))/sum(rf_tab_train)
+
+# Testing Data Validation
+
+rf_predict_test <- predict(rf_form_fit, new_data = data_test_fh)
+
+
+data_test_fh$Prediction <- rf_predict_test$.pred_class
+
+rf_tab_test <- table(Actual = data_train_fh$fetal_health, Predicted = data_train_fh$pred)
+
+sum(diag(rf_tab_test))/sum(rf_tab_test)
+
+```
+
+
+
+###Principal Component Analysis
+
+This section will evaluate the principal components in the data set.
+
+```{r PCA}
+
+# Load necessary libraries
+library(lavaan)
+library(semTools)
+library(psych)
+
+pca_clean_healthcare_data <- clean_healthcare_data %>%
+  select(!starts_with("histogram")) %>%
+  select(!fetal_health)
+
+# Perform PCA
+pca_result <- prcomp(pca_clean_healthcare_data)
+
+summary(pca_result)
+
+biplot(pca_result)
+
+plot(pca_result,type="l")
+
+# Extract factor loadings and loadings of observed variables
+factor_loadings <- pca_result$loadings
+observed_loadings <- factor_loadings[, 1]
+
+# Create a new dataset with the principal component as the observed variable
+pca_data <- as.data.frame(pca_result$scores[, 1])
+
+head(pca_data)
+
+pca_clean_healthcare_data_agg <- clean_healthcare_data %>% 
+  select(!starts_with("histogram")) %>%
+  select(!fetal_health) %>% 
+
+# Perform PCA
+pca_result <- prcomp(pca_clean_healthcare_data)
+
+summary(pca_result)
+
+biplot(pca_result)
+
+plot(pca_result,type="l")
+
+
+```
