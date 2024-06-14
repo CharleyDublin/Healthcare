@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Charley Dublin Jr.">
+<meta name="dcterms.date" content="2024-06-01">
+
+<title>Healthcare Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="HealthCare_files/libs/clipboard/clipboard.min.js"></script>
+<script src="HealthCare_files/libs/quarto-html/quarto.js"></script>
+<script src="HealthCare_files/libs/quarto-html/popper.min.js"></script>
+<script src="HealthCare_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="HealthCare_files/libs/quarto-html/anchor.min.js"></script>
+<link href="HealthCare_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="HealthCare_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="HealthCare_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="HealthCare_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="HealthCare_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Healthcare Analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Charley Dublin Jr. </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 1, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of Contents</h2>
+   
+  <ul>
+  <li><a href="#health-care-analysis" id="toc-health-care-analysis">Health Care Analysis</a>
+  <ul>
+  <li><a href="#fetal-health-care-fhc" id="toc-fetal-health-care-fhc">Fetal Health Care (FHC)</a>
+  <ul>
+  <li><a href="#overview-of-fhc1" id="toc-overview-of-fhc1">Overview of FHC</a></li>
+  <li><a href="#dataset" id="toc-dataset"><strong>Dataset</strong></a></li>
+  </ul></li>
+  <li><a href="#bottom-line" id="toc-bottom-line">Bottom Line</a>
+  <ul>
+  <li><a href="#next-steps" id="toc-next-steps">Next Steps</a></li>
+  <li><a href="#section" id="toc-section"></a></li>
+  </ul></li>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis">Exploratory Data Analysis</a></li>
+  <li><a href="#models" id="toc-models">Models</a>
+  <ul>
+  <li><a href="#multinomial-logistic-regression" id="toc-multinomial-logistic-regression">Multinomial Logistic Regression</a></li>
+  <li><a href="#random-forest" id="toc-random-forest">Random Forest</a></li>
+  <li><a href="#random-forest---parsimonious" id="toc-random-forest---parsimonious">Random Forest - Parsimonious</a></li>
+  <li><a href="#decision-tree" id="toc-decision-tree">Decision Tree</a></li>
+  <li><a href="#xgboost" id="toc-xgboost">XGBoost</a></li>
+  <li><a href="#principal-component-analysis-pca" id="toc-principal-component-analysis-pca">Principal Component Analysis (PCA)</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="HealthCare.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+<section id="health-care-analysis" class="level1">
+<h1>Health Care Analysis</h1>
+<section id="fetal-health-care-fhc" class="level2">
+<h2 class="anchored" data-anchor-id="fetal-health-care-fhc">Fetal Health Care (FHC)</h2>
+<section id="overview-of-fhc1" class="level3">
+<h3 class="anchored" data-anchor-id="overview-of-fhc1">Overview of FHC<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></h3>
+<p>A cardiotocogram (CTG) is a technical recording of the fetal heartbeat and uterine contractions during pregnancy. It is primarily used in obstetrics to monitor the well-being of the fetus during the third trimester of pregnancy and during labor.</p>
+<p>The CTG provides important information about the fetal heart rate (FHR) and its response to uterine contractions, which helps healthcare providers assess the fetal condition and detect any signs of fetal distress.</p>
+<p>This data was obtained from a data set on Kaggle and was used for public analysis. The data set was used but the analysis is orginal to the author in order to develop independent meaning from the data set.</p>
+<p><u><strong>Key Components of a CTG:</strong></u></p>
+<p><strong>Fetal Heart Rate (FHR):</strong></p>
+<p><u>Baseline Rate:</u></p>
+<p>The average heart rate of the fetus, usually measured over a period of 10 minutes. A normal baseline FHR is between 110 and 160 beats per minute (bpm).</p>
+<p><u>Variability:</u></p>
+<p>Fluctuations in the baseline FHR, which indicate the health and responsiveness of the fetal autonomic nervous system.</p>
+<p><u>Accelerations:</u></p>
+<p>Temporary increases in FHR, typically associated with fetal movements. Accelerations are generally a positive sign, indicating good fetal well-being.</p>
+<p><u>Decelerations:</u></p>
+<p>Temporary decreases in FHR. These can be benign or indicate potential issues, depending on their timing, duration, and relationship to uterine contractions.</p>
+<p><u>Uterine Contractions:</u></p>
+<p>The frequency, duration, and intensity of uterine contractions are recorded. This helps in assessing the labor progress and the fetal response to the contractions.</p>
+<p><strong>Types of Monitoring:</strong></p>
+<p><u>External CTG:</u></p>
+<p>Uses external sensors placed on the mother’s abdomen to monitor the FHR and uterine contractions. It is non-invasive and commonly used during prenatal visits and early labor.</p>
+<p><u>Internal CTG:</u></p>
+<p>Involves placing an electrode on the fetal scalp and a pressure catheter inside the uterus. This method provides more accurate data but is invasive and typically used when closer monitoring is needed during labor.</p>
+<p><strong>Interpretation:</strong></p>
+<p>Healthcare providers analyze the CTG to assess fetal well-being. They look at the baseline FHR, variability, accelerations, and decelerations. The patterns observed can help in determining if the fetus is in distress and if any interventions, such as changes in maternal position, oxygen administration, or expedited delivery, are needed.</p>
+<p><strong>Importance of CTG:</strong></p>
+<p><u>Detection of Fetal Distress:</u></p>
+<p>Helps identify signs of hypoxia (lack of oxygen) or other issues that may compromise fetal health.</p>
+<p><u>Labor Management:</u></p>
+<p>Assists in making informed decisions about labor progress and interventions.</p>
+<p><u>Reassurance:</u></p>
+<p>Provides reassurance to expectant mothers when the fetal heart rate and patterns are normal.</p>
+<p>Overall, a cardiotocogram is a crucial tool in prenatal care and labor management, helping ensure the safety and health of both the mother and the baby.</p>
+</section>
+<section id="dataset" class="level3">
+<h3 class="anchored" data-anchor-id="dataset"><strong>Dataset</strong></h3>
+<p>This dataset contains 2126 records of features extracted from Cardiotocogram exams, which were then classified by expert obstetrician into 3 classes:</p>
+<p>1 - Normal</p>
+<p>2 - Suspect</p>
+<p>3 - Pathological</p>
+<p><em>Features:</em></p>
+<p><strong>‘baseline value’</strong> - FHR baseline (beats per minute)</p>
+<p><strong>‘accelerations’</strong> - Number of accelerations per second</p>
+<p><strong>‘fetal_movement’</strong> - Number of fetal movements per second</p>
+<p><strong>‘uterine_contractions’</strong> - Number of uterine contractions per second</p>
+<p><strong>‘light_decelerations’</strong> - Number of light decelerations per second</p>
+<p><strong>‘severe_decelerations’</strong> - Number of severe decelerations per second</p>
+<p><strong>‘prolongued_decelerations’</strong> - Number of prolonged decelerations per second</p>
+<p><strong>‘abnormal_short_term_variability’</strong> - Percentage of time with abnormal short term variability</p>
+<p><strong>‘mean_value_of_short_term_variability’</strong> - Mean value of short term variability</p>
+<p><strong>‘percentage_of_time_with_abnormal_long_term_variability’ -</strong> Percentage of time with abnormal long term variability</p>
+<p><strong>‘mean_value_of_long_term_variability’</strong> - Mean value of long term variability</p>
+<p><strong>‘histogram_width’</strong> - Width of FHR histogram</p>
+<p><strong>‘histogram_min’</strong> - Minimum (low frequency) of FHR histogram</p>
+<p><strong>‘histogram_max’</strong> - Maximum (high frequency) of FHR histogram</p>
+<p><strong>‘histogram_number_of_peaks’</strong> - Number of histogram peaks</p>
+<p><strong>‘histogram_number_of_zeroes’ -</strong> Number of histogram zeros</p>
+<p><strong>‘histogram_mode’</strong> - Histogram mode</p>
+<p><strong>‘histogram_mean’</strong> - Histogram mean</p>
+<p><strong>‘histogram_median’ -</strong> Histogram median</p>
+<p><strong>‘histogram_variance’</strong> - Histogram variance</p>
+<p><strong>‘histogram_tendency’</strong> - Histogram tendency</p>
+<div class="callout callout-style-simple callout-tip callout-titled" style="color: green">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Target Outcome Variable: Fetal Health
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>‘fetal_health’</strong> Tagged as:</p>
+<p><strong><em>1 - Normal</em></strong></p>
+<p><strong><em>2 - Suspect</em></strong></p>
+<p><strong><em>3 - Pathological</em></strong></p>
+</div>
+</div>
+</section>
+</section>
+<section id="bottom-line" class="level2">
+<h2 class="anchored" data-anchor-id="bottom-line">Bottom Line</h2>
+<p>Overall, based on this data set, we can reliably predict fetal outcomes based on CTG data. In this analysis, we perform a multinomial regression, random forest, decision tree, and XGBoost. Each model had prediction accuracy ratings from mid-80% to mid-90%, with XGBoost performing the best. However, the most interpretable and nearly as accurate was the decision tree using the rpart library.</p>
+<p>Here is the primary decision tree graphic that can be used to determine which factors are important and can be used to determine fetal health outcomes based on CTG ratings (again, based on this provided data set):</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/Decision%20Tree%20for%20FHR-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<section id="next-steps" class="level3">
+<h3 class="anchored" data-anchor-id="next-steps">Next Steps</h3>
+<ol type="1">
+<li>Evaluate this data set with other sources of data from other diagnostic devices.</li>
+<li>Evaluate these models from CTG data from hospitals to validate the accuracy of the models.</li>
+<li>Review the decision tree with doctors in the field that use CTG devices to see if the decision tree makes sense based on their experience and determine whether it is simple and easy to understand for practical purposes.</li>
+</ol>
+</section>
+<section id="section" class="level3">
+<h3 class="anchored" data-anchor-id="section"></h3>
+<hr>
+</section>
+</section>
+<section id="exploratory-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis</h2>
+<p>This section analysis the variables from CTG dataset to understand their characteristics in more depth before doing any analysis.</p>
+<div class="cell">
+<div class="cell-output-display">
+ 
+
+  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tinytable_xa9mqaqqvc6b7o0shgtf</title>
+    <style>
+.table td.tinytable_css_3y610yadde5a50icn215, .table th.tinytable_css_3y610yadde5a50icn215 {    border-bottom: solid 0.1em #d3d8dc; }
+.table td.tinytable_css_12rk4zuqo73svw48m112, .table th.tinytable_css_12rk4zuqo73svw48m112 {    text-align: left; }
+.table td.tinytable_css_ths5pmbxq3gapwgyumi3, .table th.tinytable_css_ths5pmbxq3gapwgyumi3 {    text-align: left; }
+.table td.tinytable_css_k90rhf9q4rkslv519pa1, .table th.tinytable_css_k90rhf9q4rkslv519pa1 {    text-align: left; }
+.table td.tinytable_css_fas39z75xn8ffiq9k9al, .table th.tinytable_css_fas39z75xn8ffiq9k9al {    text-align: left; }
+.table td.tinytable_css_e86zf29qc7460dnufugi, .table th.tinytable_css_e86zf29qc7460dnufugi {    text-align: left; }
+.table td.tinytable_css_dji8q33trqkiaqh98ly5, .table th.tinytable_css_dji8q33trqkiaqh98ly5 {    text-align: left; }
+.table td.tinytable_css_bj36ic15stbmhl0wiftp, .table th.tinytable_css_bj36ic15stbmhl0wiftp {    text-align: left; }
+.table td.tinytable_css_cs3f0ehdverpnu6508b8, .table th.tinytable_css_cs3f0ehdverpnu6508b8 {    text-align: left; }
+.table td.tinytable_css_4ktqa3z88zv6qg9o8w1g, .table th.tinytable_css_4ktqa3z88zv6qg9o8w1g {    text-align: left; }
+    </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+    </script>
+  
+
+  
+    <div class="container">
+      <table class="table table-borderless" id="tinytable_xa9mqaqqvc6b7o0shgtf" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        <thead>
+        
+              <tr>
+                <th scope="col"> </th>
+                <th scope="col">Unique</th>
+                <th scope="col">Missing Pct.</th>
+                <th scope="col">Mean</th>
+                <th scope="col">SD</th>
+                <th scope="col">Min</th>
+                <th scope="col">Median</th>
+                <th scope="col">Max</th>
+                <th scope="col">Histogram</th>
+              </tr>
+        </thead>
+        
+        <tbody>
+                <tr>
+                  <td>baseline.value</td>
+                  <td>48</td>
+                  <td>0</td>
+                  <td>133.3</td>
+                  <td>9.8</td>
+                  <td>106.0</td>
+                  <td>133.0</td>
+                  <td>160.0</td>
+                  <td><img src="./tinytable_assets/idopmbt7m6s0tcpbgbz6rx.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>accelerations</td>
+                  <td>20</td>
+                  <td>0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td><img src="./tinytable_assets/id4jfdbqrgvdua52gule73.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>fetal_movement</td>
+                  <td>102</td>
+                  <td>0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.5</td>
+                  <td><img src="./tinytable_assets/idfq90o2i0yligm59dq7hj.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>uterine_contractions</td>
+                  <td>16</td>
+                  <td>0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td><img src="./tinytable_assets/idgrmqb2rkknr9fm4fc5v5.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>light_decelerations</td>
+                  <td>16</td>
+                  <td>0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td><img src="./tinytable_assets/idywtwy12jmnn50hidwe0k.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>severe_decelerations</td>
+                  <td>2</td>
+                  <td>0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td><img src="./tinytable_assets/id3ev3f8om0i15c3ew29ip.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>prolongued_decelerations</td>
+                  <td>6</td>
+                  <td>0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td><img src="./tinytable_assets/idbxxx74ec9wws77zairag.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>abnormal_short_term_variability</td>
+                  <td>75</td>
+                  <td>0</td>
+                  <td>47.0</td>
+                  <td>17.2</td>
+                  <td>12.0</td>
+                  <td>49.0</td>
+                  <td>87.0</td>
+                  <td><img src="./tinytable_assets/idg0hb1bjiu0x92iglncjy.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>mean_value_of_short_term_variability</td>
+                  <td>57</td>
+                  <td>0</td>
+                  <td>1.3</td>
+                  <td>0.9</td>
+                  <td>0.2</td>
+                  <td>1.2</td>
+                  <td>7.0</td>
+                  <td><img src="./tinytable_assets/idkngrdqra93mwlakyayrq.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>percentage_of_time_with_abnormal_long_term_variability</td>
+                  <td>87</td>
+                  <td>0</td>
+                  <td>9.8</td>
+                  <td>18.4</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>91.0</td>
+                  <td><img src="./tinytable_assets/idslsh23217iqug96k7biz.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>mean_value_of_long_term_variability</td>
+                  <td>249</td>
+                  <td>0</td>
+                  <td>8.2</td>
+                  <td>5.6</td>
+                  <td>0.0</td>
+                  <td>7.4</td>
+                  <td>50.7</td>
+                  <td><img src="./tinytable_assets/idxxffj81y4drvw37uxynu.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>histogram_width</td>
+                  <td>154</td>
+                  <td>0</td>
+                  <td>70.4</td>
+                  <td>39.0</td>
+                  <td>3.0</td>
+                  <td>67.5</td>
+                  <td>180.0</td>
+                  <td><img src="./tinytable_assets/id97dawl2vtz6x339672r0.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>histogram_min</td>
+                  <td>109</td>
+                  <td>0</td>
+                  <td>93.6</td>
+                  <td>29.6</td>
+                  <td>50.0</td>
+                  <td>93.0</td>
+                  <td>159.0</td>
+                  <td><img src="./tinytable_assets/idci53ah68l5hh07or001z.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>histogram_max</td>
+                  <td>86</td>
+                  <td>0</td>
+                  <td>164.0</td>
+                  <td>17.9</td>
+                  <td>122.0</td>
+                  <td>162.0</td>
+                  <td>238.0</td>
+                  <td><img src="./tinytable_assets/idu17eqlwvgj9mmcn4qeyi.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>histogram_number_of_peaks</td>
+                  <td>18</td>
+                  <td>0</td>
+                  <td>4.1</td>
+                  <td>2.9</td>
+                  <td>0.0</td>
+                  <td>3.0</td>
+                  <td>18.0</td>
+                  <td><img src="./tinytable_assets/idaffei9h81oug5hhq6cyt.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>histogram_number_of_zeroes</td>
+                  <td>9</td>
+                  <td>0</td>
+                  <td>0.3</td>
+                  <td>0.7</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>10.0</td>
+                  <td><img src="./tinytable_assets/id8chn7szpi95ltgogfk5n.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>histogram_mode</td>
+                  <td>88</td>
+                  <td>0</td>
+                  <td>137.5</td>
+                  <td>16.4</td>
+                  <td>60.0</td>
+                  <td>139.0</td>
+                  <td>187.0</td>
+                  <td><img src="./tinytable_assets/idq55ilvn8u0rbj1bn3n24.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>histogram_mean</td>
+                  <td>103</td>
+                  <td>0</td>
+                  <td>134.6</td>
+                  <td>15.6</td>
+                  <td>73.0</td>
+                  <td>136.0</td>
+                  <td>182.0</td>
+                  <td><img src="./tinytable_assets/id8nx175u3ot2nhw7py6hc.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>histogram_median</td>
+                  <td>95</td>
+                  <td>0</td>
+                  <td>138.1</td>
+                  <td>14.5</td>
+                  <td>77.0</td>
+                  <td>139.0</td>
+                  <td>186.0</td>
+                  <td><img src="./tinytable_assets/idqyixpjdd9b7zr3d4bfci.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>histogram_variance</td>
+                  <td>133</td>
+                  <td>0</td>
+                  <td>18.8</td>
+                  <td>29.0</td>
+                  <td>0.0</td>
+                  <td>7.0</td>
+                  <td>269.0</td>
+                  <td><img src="./tinytable_assets/idicoyom2gagyhm55ar23h.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>histogram_tendency</td>
+                  <td>3</td>
+                  <td>0</td>
+                  <td>0.3</td>
+                  <td>0.6</td>
+                  <td>-1.0</td>
+                  <td>0.0</td>
+                  <td>1.0</td>
+                  <td><img src="./tinytable_assets/idv2l5m2d5sna83i8fcm6z.png" style="height: 1em;"></td>
+                </tr>
+                <tr>
+                  <td>fetal_health</td>
+                  <td>3</td>
+                  <td>0</td>
+                  <td>1.3</td>
+                  <td>0.6</td>
+                  <td>1.0</td>
+                  <td>1.0</td>
+                  <td>3.0</td>
+                  <td><img src="./tinytable_assets/idgvnl9pp4rug838fw0g4f.png" style="height: 1em;"></td>
+                </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      function styleCell_tinytable_ecmgalt7l93oxjmkhbyh(i, j, css_id) {
+        var table = document.getElementById("tinytable_xa9mqaqqvc6b7o0shgtf");
+        table.rows[i].cells[j].classList.add(css_id);
+      }
+      function insertSpanRow(i, colspan, content) {
+        var table = document.getElementById('tinytable_xa9mqaqqvc6b7o0shgtf');
+        var newRow = table.insertRow(i);
+        var newCell = newRow.insertCell(0);
+        newCell.setAttribute("colspan", colspan);
+        // newCell.innerText = content;
+        // this may be unsafe, but innerText does not interpret <br>
+        newCell.innerHTML = content;
+      }
+      function spanCell_tinytable_ecmgalt7l93oxjmkhbyh(i, j, rowspan, colspan) {
+        var table = document.getElementById("tinytable_xa9mqaqqvc6b7o0shgtf");
+        const targetRow = table.rows[i];
+        const targetCell = targetRow.cells[j];
+        for (let r = 0; r < rowspan; r++) {
+          // Only start deleting cells to the right for the first row (r == 0)
+          if (r === 0) {
+            // Delete cells to the right of the target cell in the first row
+            for (let c = colspan - 1; c > 0; c--) {
+              if (table.rows[i + r].cells[j + c]) {
+                table.rows[i + r].deleteCell(j + c);
+              }
+            }
+          }
+          // For rows below the first, delete starting from the target column
+          if (r > 0) {
+            for (let c = colspan - 1; c >= 0; c--) {
+              if (table.rows[i + r] && table.rows[i + r].cells[j]) {
+                table.rows[i + r].deleteCell(j);
+              }
+            }
+          }
+        }
+        // Set rowspan and colspan of the target cell
+        targetCell.rowSpan = rowspan;
+        targetCell.colSpan = colspan;
+      }
+
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 0, 'tinytable_css_3y610yadde5a50icn215') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 1, 'tinytable_css_3y610yadde5a50icn215') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 2, 'tinytable_css_3y610yadde5a50icn215') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 3, 'tinytable_css_3y610yadde5a50icn215') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 4, 'tinytable_css_3y610yadde5a50icn215') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 5, 'tinytable_css_3y610yadde5a50icn215') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 6, 'tinytable_css_3y610yadde5a50icn215') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 7, 'tinytable_css_3y610yadde5a50icn215') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 8, 'tinytable_css_3y610yadde5a50icn215') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(1, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(2, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(3, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(4, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(5, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(6, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(7, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(8, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(9, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(10, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(11, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(12, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(13, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(14, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(15, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(16, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(17, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(18, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(19, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(20, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(21, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(22, 0, 'tinytable_css_12rk4zuqo73svw48m112') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(1, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(2, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(3, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(4, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(5, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(6, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(7, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(8, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(9, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(10, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(11, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(12, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(13, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(14, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(15, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(16, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(17, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(18, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(19, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(20, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(21, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(22, 1, 'tinytable_css_ths5pmbxq3gapwgyumi3') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(1, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(2, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(3, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(4, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(5, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(6, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(7, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(8, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(9, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(10, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(11, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(12, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(13, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(14, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(15, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(16, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(17, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(18, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(19, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(20, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(21, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(22, 2, 'tinytable_css_k90rhf9q4rkslv519pa1') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(1, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(2, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(3, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(4, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(5, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(6, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(7, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(8, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(9, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(10, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(11, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(12, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(13, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(14, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(15, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(16, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(17, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(18, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(19, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(20, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(21, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(22, 3, 'tinytable_css_fas39z75xn8ffiq9k9al') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(1, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(2, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(3, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(4, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(5, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(6, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(7, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(8, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(9, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(10, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(11, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(12, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(13, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(14, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(15, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(16, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(17, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(18, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(19, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(20, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(21, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(22, 4, 'tinytable_css_e86zf29qc7460dnufugi') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(1, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(2, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(3, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(4, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(5, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(6, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(7, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(8, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(9, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(10, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(11, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(12, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(13, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(14, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(15, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(16, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(17, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(18, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(19, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(20, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(21, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(22, 5, 'tinytable_css_dji8q33trqkiaqh98ly5') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(1, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(2, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(3, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(4, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(5, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(6, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(7, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(8, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(9, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(10, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(11, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(12, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(13, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(14, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(15, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(16, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(17, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(18, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(19, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(20, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(21, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(22, 6, 'tinytable_css_bj36ic15stbmhl0wiftp') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(1, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(2, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(3, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(4, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(5, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(6, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(7, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(8, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(9, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(10, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(11, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(12, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(13, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(14, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(15, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(16, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(17, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(18, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(19, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(20, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(21, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(22, 7, 'tinytable_css_cs3f0ehdverpnu6508b8') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(0, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(1, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(2, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(3, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(4, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(5, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(6, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(7, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(8, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(9, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(10, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(11, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(12, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(13, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(14, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(15, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(16, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(17, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(18, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(19, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(20, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(21, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+window.addEventListener('load', function () { styleCell_tinytable_ecmgalt7l93oxjmkhbyh(22, 8, 'tinytable_css_4ktqa3z88zv6qg9o8w1g') })
+    </script>
+
+  
+
+
+</div>
+</div>
+<p>Here are detailed plots of the main variables and their relationship to fetal health.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/EDA%20Key%20Plots-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/EDA%20Key%20Plots-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/EDA%20Key%20Plots-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/EDA%20Key%20Plots-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/EDA%20Key%20Plots-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/EDA%20Key%20Plots-6.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/EDA%20Key%20Plots-7.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/EDA%20Key%20Plots-8.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/EDA%20Key%20Plots-9.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Deeper Dive Into FHR</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Correlation Analysis</strong></p>
+<p>This section provides more definitive view of the correlation of variables from the data set.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/Basic%20Correlation%20Analysis-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Key Findings:</p>
+<ul>
+<li><p>Fetal Health gets worse (score goes up) as ‘abnormal short term variability’, ‘percentage of time with abornmal long term variability’, and ‘prolonged decelerations’ goes up (positively correlated).</p></li>
+<li><p>Fetal Health gets better (‘fetal health’ score goes down) as ‘accelerations’ and ‘uterine contractions’ go up (negatively correlated).</p></li>
+<li><p>There appears to be significant colinearity in this data set.</p></li>
+</ul>
+</section>
+<section id="models" class="level2">
+<h2 class="anchored" data-anchor-id="models">Models</h2>
+<section id="multinomial-logistic-regression" class="level3">
+<h3 class="anchored" data-anchor-id="multinomial-logistic-regression">Multinomial Logistic Regression</h3>
+<p>The multionomial model has an accuracy level of 0.8714734</p>
+<p>And here is the confusion matrix:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>      Predicted
+Actual   1   2   3
+     1 476   9   7
+     2  31  54  10
+     3  11  14  26</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Interpret Odds Ratios:</strong></p>
+<ul>
+<li><p>Odds Ratio &gt; 1: Indicates that an increase in the predictor variable is associated with higher odds of being in the respective response category compared to the baseline category.</p></li>
+<li><p>Odds Ratio &lt; 1: Indicates that an increase in the predictor variable is associated with lower odds of being in the respective response category compared to the baseline category.</p></li>
+<li><p>Odds Ratio = 1: Indicates no change in odds with respect to the baseline category.</p></li>
+</ul>
+<p><strong>Plot of Relationship of Key Variables</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/Beautiful%20Plot%20of%20FH%20Data-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="random-forest" class="level3">
+<h3 class="anchored" data-anchor-id="random-forest">Random Forest</h3>
+<p>The accuracy level of this model is 0.9285042</p>
+</section>
+<section id="random-forest---parsimonious" class="level3">
+<h3 class="anchored" data-anchor-id="random-forest---parsimonious">Random Forest - Parsimonious</h3>
+<p>This model has fewer variables and is tested to make the model as parsimonious as possible to improve the stability of the model across different CTG data sets.</p>
+<p>Here are the results from the parsimonious test:</p>
+<p>The accuracy level of this model is 0.8617121</p>
+</section>
+<section id="decision-tree" class="level3">
+<h3 class="anchored" data-anchor-id="decision-tree">Decision Tree</h3>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.9248826</code></pre>
+</div>
+</div>
+<p>The accuracy level of this model is 0.9248826</p>
+<p>Here are the results from the decision tree model:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Here is the simplified decision tree logic to arrive at determining if tehre is a severe position:</p>
+<ul>
+<li><p>If(abnormal_short_term_variation is &lt; 60) &amp; (prolonged_decelerations &lt; .0015) &amp; (fetal_heart_rate &lt; 129)</p></li>
+<li><p>If(abnormal_short_term_variation is &gt; 60) &amp; (percentage_of_time_with_abnormal_long_term_variability &lt; 6.5) &amp; (prolonged_decelerations &gt; .0015)</p></li>
+<li><p>If(abnormal_short_term_variation is &gt; 74) &amp; (percentage_of_time_with_abnormal_long_term_variability &lt; 6.5) &amp; (prolonged_decelerations &lt; .0015)</p></li>
+<li><p>If(abnormal_short_term_variation is &gt; 60) &amp; (percentage_of_time_with_abnormal_long_term_variability &lt; 6.5) &amp; (prolonged_decelerations &lt; .0015) &amp; (abnormal_short_term_variation is &lt; 74) &amp; (FHR between 117 and 123)</p></li>
+<li><p>If(abnormal_short_term_variation is &gt; 60) &amp; (percentage_of_time_with_abnormal_long_term_variability &gt; 69)</p></li>
+<li><p>If(abnormal_short_term_variation is &gt; 60 and &lt;80) &amp; (percentage_of_time_with_abnormal_long_term_variability &gt; 6.5 and &lt;69) &amp; (FHR &gt; 137)</p></li>
+</ul>
+<p>Here is the raw output from the model itself, which some may find more readable:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>       prob.1     prob.2     prob.3
+1  0.07142857 0.21428571 0.71428571
+2  0.00000000 0.33333333 0.66666667
+6  0.12500000 0.00000000 0.87500000
+11 0.11111111 0.00000000 0.88888889
+19 0.02439024 0.00000000 0.97560976
+31 0.00000000 0.00000000 1.00000000
+                                                                                                   rule
+1                                                   ab_st_var &lt; 59.5 &amp; p_decel &gt;= 0.0015 &amp; FHR &gt;= 128.5
+2                          ab_st_var &gt;= 59.5 &amp; pcn_ab_lt_var &lt; 6.5 &amp; p_decel &lt; 0.0015 &amp; ab_st_var &gt;= 74
+6                                      ab_st_var &gt;= 59.5 &amp; pcn_ab_lt_var &gt;= 6.5 &amp; pcn_ab_lt_var &gt;= 68.5
+11   ab_st_var &gt;= 59.5 &amp; pcn_ab_lt_var &gt;= 6.5 &amp; pcn_ab_lt_var &lt; 68.5 &amp; FHR &gt;= 136.5 &amp; ab_st_var &gt;= 79.5
+19                                          ab_st_var &gt;= 59.5 &amp; pcn_ab_lt_var &lt; 6.5 &amp; p_decel &gt;= 0.0015
+31 ab_st_var &gt;= 59.5 &amp; pcn_ab_lt_var &lt; 6.5 &amp; p_decel &lt; 0.0015 &amp; ab_st_var &lt; 74 &amp; FHR &lt; 123 &amp; FHR &gt;= 117</code></pre>
+</div>
+</div>
+</section>
+<section id="xgboost" class="level3">
+<h3 class="anchored" data-anchor-id="xgboost">XGBoost</h3>
+<p>This section utilizes the XGBoost package as an alternative ensemble technique. XGBoost stands for “Extreme Gradient Boosting” and utilizes decicion trees with gradient boosting, meaning decision trees are constructed sequentially, where each tree tries to correct the errors of the previous trees. It optimizes a loss function by adding trees to the model that reduce this loss and eliminates trees that increases loss. This is a very popular optimization method currently and did yield the best results from this analysis.</p>
+<p>The accuracy of this model is 0.9405321</p>
+<p>Additional visualizations of the XGBoost here:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Let’s remove the historical data, as it may be over fitting the model</p>
+<p>The accuracy of this model is also high at 0.9341693 This is a good model due to fewer factors for potentially covariant variables.</p>
+<p>Here is visualization of this more parsimonious model:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/unnamed-chunk-11-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="principal-component-analysis-pca" class="level3">
+<h3 class="anchored" data-anchor-id="principal-component-analysis-pca">Principal Component Analysis (PCA)</h3>
+<p>This section will evaluate the principal components in the data set. PCA is a method to reduce dimensionality (fewer predictor variables) in the data set by organizing one or more covaried predictors into “factors” that are linear combinations of the original variables. Factors or sorted by the maximum variation they explain in the data. It utilizes a covariance matrix to understand the relationship between variables, similar to the correlation matrix earlier in this document. The net of this is that most important variables that explain the data and that are uncorrelated are identified and can be used for a better, more stable analysis. The downside is that it does require more interpretation and complexity in the explanatory aspect of the model.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/PCA-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HealthCare_files/figure-html/PCA-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Source: <a href="https://www.kaggle.com/code/karnikakapoor/fetal-health-classification/notebook" class="uri">https://www.kaggle.com/code/karnikakapoor/fetal-health-classification/notebook</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

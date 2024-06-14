@@ -16,6 +16,7 @@ format:
 execute:
   echo: false
   warning: false
+  error: false
 ---
 
 ```{r Clear Environment & Load Libraries, warning = FALSE}
@@ -56,17 +57,9 @@ library(modelsummary)
 library(DataExplorer)
 library(echarts4r)
 library(conflicted)
+library(janitor)
+library(xgboost)
 
-  conflicts_prefer(
-    ggplot2::annotate
-#    dplyr::filter,
-#    dplyr::lag,
-#    dplyr::select,
-#    dplyr::mutate(),
-#    dplyr::summarize(),
-##    dplyr::summarise(),
-#    dplyr::arrange()
-  )
 
 tidymodels_prefer()
 theme_set(theme_bw(base_size=10))
@@ -128,7 +121,9 @@ A cardiotocogram (CTG) is a technical recording of the fetal heartbeat and uteri
 
 The CTG provides important information about the fetal heart rate (FHR) and its response to uterine contractions, which helps healthcare providers assess the fetal condition and detect any signs of fetal distress.
 
-**Key Components of a CTG:**
+This data was obtained from a data set on Kaggle and was used for public analysis. The data set was used but the analysis is orginal to the author in order to develop independent meaning from the data set.
+
+[**Key Components of a CTG:**]{.underline}
 
 **Fetal Heart Rate (FHR):**
 
@@ -148,7 +143,7 @@ Temporary increases in FHR, typically associated with fetal movements. Accelerat
 
 Temporary decreases in FHR. These can be benign or indicate potential issues, depending on their timing, duration, and relationship to uterine contractions.
 
-**Uterine Contractions:**
+[Uterine Contractions:]{.underline}
 
 The frequency, duration, and intensity of uterine contractions are recorded. This helps in assessing the labor progress and the fetal response to the contractions.
 
@@ -236,25 +231,52 @@ This dataset contains 2126 records of features extracted from Cardiotocogram exa
 
 **'histogram_tendency'** - Histogram tendency
 
-[**Target Outcome Variable is 'Fetal Health'**]{.underline}
+::: {.callout-tip style="color: green" appearance="simple"}
+## Target Outcome Variable: Fetal Health
 
-**'fetal_health'** Tagged as ***1 (Normal), 2 (Suspect) and 3 (Pathological)***
+**'fetal_health'** Tagged as:
 
-### **Exploratory Data Analysis**
+***1 - Normal***
+
+***2 - Suspect***
+
+***3 - Pathological***
+:::
+
+## Bottom Line
+
+Overall, based on this data set, we can reliably predict fetal outcomes based on CTG data. In this analysis, we perform a multinomial regression, random forest, decision tree, and XGBoost. Each model had prediction accuracy ratings from mid-80% to mid-90%, with XGBoost performing the best. However, the most interpretable and nearly as accurate was the decision tree using the rpart library.
+
+Here is the primary decision tree graphic that can be used to determine which factors are important and can be used to determine fetal health outcomes based on CTG ratings (again, based on this provided data set):
+
+![](HealthCare_files/figure-html/Decision%20Tree%20for%20FHR-1.png){fig-align="center"}
+
+### Next Steps
+
+1.  Evaluate this data set with other sources of data from other diagnostic devices.
+2.  Evaluate these models from CTG data from hospitals to validate the accuracy of the models.
+3.  Review the decision tree with doctors in the field that use CTG devices to see if the decision tree makes sense based on their experience and determine whether it is simple and easy to understand for practical purposes.
 
 ### 
+
+------------------------------------------------------------------------
+
+## Exploratory Data Analysis
+
+This section analysis the variables from CTG dataset to understand their characteristics in more depth before doing any analysis.
 
 ```{r EDA of fetal data set}
 
 #summary(healthcare_data) 
 
-table(healthcare_data$fetal_health)
+#plot(table(healthcare_data$fetal_health))
 datasummary_skim(healthcare_data)
 
 #plot(healthcare_data$severe_decelerations)
 
 ```
 
+Here are detailed plots of the main variables and their relationship to fetal health.
 
 ```{r EDA Key Plots}
 
@@ -421,8 +443,9 @@ ggplot(aes(x=as.factor(FHR_Measure), y=FHR_Values)) +
 
 ```
 
-
 **Correlation Analysis**
+
+This section provides more definitive view of the correlation of variables from the data set.
 
 ```{r Basic Correlation Analysis}
 
@@ -457,10 +480,11 @@ Key Findings:
 
 -   There appears to be significant colinearity in this data set.
 
+## Models
+
 ### Multinomial Logistic Regression
 
-```{r}
-
+```{r Multinomial Regression, message=FALSE, warning=FALSE}
 
 require(nnet)
 
@@ -471,36 +495,46 @@ data_split_fh <- initial_split(clean_healthcare_data, prop = 0.7, strata = fetal
 data_train_fh <- training(data_split_fh)
 data_test_fh <- testing(data_split_fh)
 
-base_model <- multinom(fetal_health ~ ., data = data_train_fh)
-summary(base_model)
+base_model <- multinom(fetal_health ~ ., data = data_train_fh, trace=FALSE)
+#summary(base_model)
 
-model2 <- multinom(fetal_health ~ baseline.value + accelerations + fetal_movement + light_decelerations + severe_decelerations + uterine_contractions  + prolongued_decelerations + abnormal_short_term_variability + percentage_of_time_with_abnormal_long_term_variability, data = data_train_fh)
-summary(model2)
+model2 <- multinom(fetal_health ~ baseline.value + accelerations + fetal_movement + light_decelerations + severe_decelerations + uterine_contractions  + prolongued_decelerations + abnormal_short_term_variability + percentage_of_time_with_abnormal_long_term_variability, data = data_train_fh, trace=FALSE)
+#summary(model2)
 
-model3 <- multinom(fetal_health ~ baseline.value + accelerations + fetal_movement + uterine_contractions+ prolongued_decelerations + abnormal_short_term_variability + percentage_of_time_with_abnormal_long_term_variability, data = data_train_fh)
+model3 <- multinom(fetal_health ~ baseline.value + accelerations + fetal_movement + uterine_contractions+ prolongued_decelerations + abnormal_short_term_variability + percentage_of_time_with_abnormal_long_term_variability, data = data_train_fh, trace=FALSE)
 
-summary(model3)
+#summary(model3)
 
 
-models <- list("Model1" <- base_model,
-            "Model2" <- model2,
-            "Model3" <- model3)
+# models <- list("Model1" <- base_model,
+#             "Model2" <- model2,
+#             "Model3" <- model3)
 
-modelsummary(models,
-             statistic = "conf.int",
-             conf_level = .99,
-             fmt = 1,
-             title = "Analyzing Linear Regression Model",
-             output="markdown")
+# modelsummary(models,
+#              statistic = "conf.int",
+#              conf_level = .99,
+#              fmt = 1,
+#              title = "Analyzing Linear Regression Model",
+#              output="markdown")
 
 #datasummary_correlation(clean_data, output="markdown")
 
-modelplot(models)
+#modelplot(models)
+
+# summary(model3) %>% plot(c("baseline.value",
+                           # "accelerations",
+                           # "fetal_movement",
+                           # "uterine_contractions",
+                           # "prolongued_decelerations",
+                           # "abnormal_short_term_variability",
+                           # "percentage_of_time_with_abnormal_long_term_variability"))
+
+# plot_models(base_model, model2, model3,
+#             show.values = TRUE)+
+#   theme("Multinomial Regression")
 
 prediction_fh_base <- predict(base_model, data=data_train_fh, type="class")
-
 prediction_fh2 <- predict(model2, data=data_train_fh, type="class")
-
 prediction_fh3 <- predict(model3, data=data_train_fh, type="class")
 
 set.seed(123)
@@ -510,19 +544,17 @@ data_train_fh$pred_model3 <- prediction_fh3
 
 bm_tab <- table(Actual = data_train_fh$fetal_health, Predicted = data_train_fh$pred_base)
 
-sum(diag(bm_tab))/sum(bm_tab)
+#sum(diag(bm_tab))/sum(bm_tab)
 
 m2_tab <- table(Actual = data_train_fh$fetal_health, Predicted = data_train_fh$pred_model2)
-sum(diag(m2_tab))/sum(m2_tab)
+#sum(diag(m2_tab))/sum(m2_tab)
 
 m3_tab <- table(Actual = data_train_fh$fetal_health, Predicted = data_train_fh$pred_model3)
-sum(diag(m3_tab))/sum(m3_tab)
+#sum(diag(m3_tab))/sum(m3_tab)
 
+model3_test <- multinom(fetal_health ~ baseline.value + accelerations + fetal_movement + uterine_contractions+ prolongued_decelerations + abnormal_short_term_variability + percentage_of_time_with_abnormal_long_term_variability, data = data_test_fh, trace=FALSE)
 
-
-model3_test <- multinom(fetal_health ~ baseline.value + accelerations + fetal_movement + uterine_contractions+ prolongued_decelerations + abnormal_short_term_variability + percentage_of_time_with_abnormal_long_term_variability, data = data_test_fh)
-
-summary(model3_test)
+#summary(model3_test)
 
 prediction_fh3_test <- predict(model3_test, data=data_test_fh, type="class")
 
@@ -530,10 +562,144 @@ data_test_fh$pred <- prediction_fh3_test
 
 
 m3_tab_test <- table(Actual = data_test_fh$fetal_health, Predicted = data_test_fh$pred)
-sum(diag(m3_tab_test))/sum(m3_tab_test)
+
+#sum(diag(m3_tab_test))/sum(m3_tab_test)
+
+
+
 
 ```
 
+The multionomial model has an accuracy level of `r sum(diag(m3_tab_test))/sum(m3_tab_test)`
+
+And here is the confusion matrix:
+
+```{r}
+
+m3_tab_test
+```
+
+```{r}
+
+
+df_model_out <- as.data.frame(exp(coef(base_model))) %>% mutate(Response_Var = row.names(.)) %>%
+  mutate_if(is.numeric, ~round(.x,2)) %>%
+  pivot_longer(cols=c(-Response_Var), names_to="Variable", values_to = "Odds_Ratio") %>%
+  mutate(
+    Category =  case_when(
+    (Odds_Ratio < 1) ~ "Lower Odds vs. Baseline",
+    (Odds_Ratio == 1) ~ "Same Odds as Baseline",
+    (Odds_Ratio > 1) ~ "Higher Odds vs. Baseline",
+    TRUE ~ "Other"
+    ),
+    Mod_Odds =  case_when(
+    (Odds_Ratio < 1) ~ Odds_Ratio,
+    (Odds_Ratio == 1) ~ 1,
+    (Odds_Ratio > 10) ~ 10,
+    TRUE ~ Odds_Ratio
+    )
+    
+  )%>%
+  mutate_if(is.character,~as.factor(.x))
+
+df_model_out %>% 
+  # ggplot(aes(x=fct_reorder(Variable,Odds_Ratio), y=Odds_Ratio))+ #,color=Response_Var
+   ggplot(aes(x=Variable, y=Mod_Odds))+ #,color=Response_Var
+#   geom_col(stat="stack", width = .1, show.legend = FALSE) + 
+   geom_point() + 
+    scale_y_continuous("",label=scales::number) + 
+  labs(y="Odds Ratio",
+       x="Fetal Health Factor",
+       title="Fetal Health Multinomial Model",
+       subtitle="Source: Kaggle Data")+
+  coord_flip() +
+  scale_y_continuous(breaks = seq(0, 10, .5))+
+  geom_hline(aes(yintercept = 1), color="grey")+ #annotate("text",y=30,x=1, label="30", collor="green")+
+#  facet_wrap(~Firearm_Type) + 
+  My_Theme_Horizontal+
+  facet_grid(Response_Var~Category)
+
+
+
+```
+
+**Interpret Odds Ratios:**
+
+-   Odds Ratio \> 1: Indicates that an increase in the predictor variable is associated with higher odds of being in the respective response category compared to the baseline category.
+
+-   Odds Ratio \< 1: Indicates that an increase in the predictor variable is associated with lower odds of being in the respective response category compared to the baseline category.
+
+-   Odds Ratio = 1: Indicates no change in odds with respect to the baseline category.
+
+**Plot of Relationship of Key Variables**
+
+```{r Beautiful Plot of FH Data}
+library(GGally)
+
+visualization_healthcare <- clean_healthcare_data %>% 
+  select(fetal_health,
+         baseline.value, 
+         accelerations,
+         fetal_movement,
+         uterine_contractions,
+         prolongued_decelerations,
+         abnormal_short_term_variability,
+         percentage_of_time_with_abnormal_long_term_variability)
+
+plot_matrix <- ggpairs(visualization_healthcare, aes(color = fetal_health))
+
+
+for(i in 1:8){
+  
+  for(j in 1:8){
+    plot_matrix[i,j] <- plot_matrix[i,j]+
+      scale_color_grey()+
+      scale_fill_grey()
+  }
+}
+
+plot_matrix
+```
+
+```{r}
+# Example Interpretation
+# 
+# Suppose we have a response variable with three categories: "A", "B", and "C", and "A" is the baseline category. We fit a multinomial logistic regression model with predictors predictor1 and predictor2.
+# 
+# R
+# Copy code
+# library(nnet)
+# data <- data.frame(response = factor(c("A", "B", "C", "A", "C", "B", ...)),
+#                    predictor1 = c(1.2, 3.4, 2.1, 0.5, 2.3, 3.1, ...),
+#                    predictor2 = c(4.5, 2.3, 3.3, 5.1, 4.2, 1.9, ...))
+# 
+# model <- multinom(response ~ predictor1 + predictor2, data = data)
+# 
+# coefs <- coef(model)
+# odds_ratios <- exp(coefs)
+# If coefs returns:
+# 
+#            predictor1 predictor2
+# B vs A     0.5         -0.3
+# C vs A     -0.2         0.4
+# Then odds_ratios would be:
+# 
+# 
+#            predictor1 predictor2
+# B vs A     1.65        0.74
+# C vs A     0.82        1.49
+# Interpretation:
+# 
+# For predictor1:
+# 
+# The odds of being in category B (vs. A) increase by a factor of 1.65 for each one-unit increase in predictor1.
+# The odds of being in category C (vs. A) decrease by a factor of 0.82 for each one-unit increase in predictor1.
+# For predictor2:
+# 
+# The odds of being in category B (vs. A) decrease by a factor of 0.74 for each one-unit increase in predictor2.
+# The odds of being in category C (vs. A) increase by a factor of 1.49 for each one-unit increase in predictor2.
+
+```
 
 ### Random Forest
 
@@ -584,7 +750,7 @@ data_train_fh$pred <- rf_predict$.pred_class
 
 rf_tab_train <- table(Actual = data_train_fh$fetal_health, Predicted = data_train_fh$pred)
 
-sum(diag(rf_tab_train))/sum(rf_tab_train)
+##sum(diag(rf_tab_train))/sum(rf_tab_train)
 
 # Testing Data Validation
 
@@ -594,17 +760,26 @@ rf_predict_test <- predict(rf_form_fit, new_data = data_test_fh)
 
 data_test_fh$Prediction <- rf_predict_test$.pred_class
 
-rf_tab_test <- table(Actual = data_train_fh$fetal_health, Predicted = data_train_fh$pred)
+rf_tab_test <- table(Actual = data_test_fh$fetal_health, Predicted = data_test_fh$Prediction)
 
-sum(diag(rf_tab_test))/sum(rf_tab_test)
+
 
 
 
 ```
 
+```{r}
+accuracy = sum(diag(rf_tab_test))/sum(rf_tab_test)
+
+#print(paste("Accuracy:", round(accuracy,2) ) )
+
+```
+
+The accuracy level of this model is `r accuracy`
 
 ### Random Forest - Parsimonious
 
+This model has fewer variables and is tested to make the model as parsimonious as possible to improve the stability of the model across different CTG data sets.
 
 ```{r}
 #clean_healthcare_data$fetal_health <- as.factor(healthcare_data$fetal_health)
@@ -640,7 +815,7 @@ data_train_fh$pred <- rf_predict$.pred_class
 
 rf_tab_train <- table(Actual = data_train_fh$fetal_health, Predicted = data_train_fh$pred)
 
-sum(diag(rf_tab_train))/sum(rf_tab_train)
+#sum(diag(rf_tab_train))/sum(rf_tab_train)
 
 # Testing Data Validation
 
@@ -649,17 +824,363 @@ rf_predict_test <- predict(rf_form_fit, new_data = data_test_fh)
 
 data_test_fh$Prediction <- rf_predict_test$.pred_class
 
-rf_tab_test <- table(Actual = data_train_fh$fetal_health, Predicted = data_train_fh$pred)
+rf_tab_test <- table(Actual = data_test_fh$fetal_health, Predicted = data_test_fh$Prediction)
 
-sum(diag(rf_tab_test))/sum(rf_tab_test)
+#sum(diag(rf_tab_test))/sum(rf_tab_test)
 
 ```
 
+Here are the results from the parsimonious test:
+
+```{r}
+
+accuracy <- sum(rf_predict_test$.pred_class == data_test_fh$fetal_health) / length(data_test_fh$fetal_health)
+
+#print(paste("Accuracy:", round(accuracy,2) ) )
 
 
-###Principal Component Analysis
+```
 
-This section will evaluate the principal components in the data set.
+The accuracy level of this model is `r accuracy`
+
+### Decision Tree
+
+```{r Decision Tree for FHR}
+# Load the MASS package
+library(MASS)
+
+dt_healthcare_data <- healthcare_data
+
+#clean_names(dt_healthcare_data)
+
+dt_healthcare_data$fetal_health <- as.factor(dt_healthcare_data$fetal_health)
+dt_healthcare_data$fetal_health <- relevel(dt_healthcare_data$fetal_health, ref = "1")
+
+dt_healthcare_data <- dt_healthcare_data %>% mutate(
+  FHR = baseline.value,
+  accel = accelerations,
+  f_mvmt = fetal_movement,
+  contractions = uterine_contractions,
+  l_decel = light_decelerations,
+  s_decel = severe_decelerations,
+  p_decel = prolongued_decelerations,
+  ab_st_var = abnormal_short_term_variability,
+  mval_st_var = mean_value_of_short_term_variability,
+  pcn_ab_lt_var = percentage_of_time_with_abnormal_long_term_variability
+)
+
+set.seed(567)
+data_split_fh <- initial_split(dt_healthcare_data, prop = 0.70, strata = fetal_health)
+data_train_fh <- training(data_split_fh)
+data_test_fh <- testing(data_split_fh)
+
+tree_spec <- decision_tree() %>%
+ set_engine("rpart") %>%
+ set_mode("classification")
+
+
+# Fit the model to the training data
+# tree_fit <- tree_spec %>%
+#   fit(fetal_health ~ FHR + 
+#         accel + 
+#         f_mvmt + 
+#         contractions+ 
+#         p_decel, data = data_train_fh)
+
+tree_fit <- tree_spec %>%
+  fit(fetal_health ~ FHR + 
+        accel + 
+        f_mvmt + 
+        contractions+ 
+        p_decel + 
+        ab_st_var + 
+        pcn_ab_lt_var, 
+      data = data_train_fh)
+
+
+# Make predictions on the testing data
+predictions <- tree_fit %>%
+ predict(data_test_fh) %>%
+ pull(.pred_class)
+
+
+data_test_fh$pred_dt <- predictions
+
+dt_tab_test <- table(Actual = data_test_fh$fetal_health, Predicted = data_test_fh$pred_dt)
+
+sum(diag(dt_tab_test))/sum(dt_tab_test)
+
+accuracy <- sum(predictions == data_test_fh$fetal_health) / length(data_test_fh$fetal_health)
+
+#print(paste("Accuracy:", round(accuracy,2) ) )
+
+```
+
+The accuracy level of this model is `r accuracy`
+
+Here are the results from the decision tree model:
+
+```{r}
+# Load the library
+library(rpart)				        # Popular decision tree algorithm
+library(rattle)					# Fancy tree plot
+library(rpart.plot)				# Enhanced tree plots
+library(RColorBrewer)				# Color selection for fancy tree plot
+#library(party)					# Alternative decision tree algorithm
+library(partykit)				# Convert rpart object to BinaryTree
+library(caret)	
+
+
+# Plot the decision tree
+rpart.plot(tree_fit$fit, 
+           type = 2, 
+           clip.right.labs = TRUE,
+           extra = 101, 
+           under = TRUE, 
+           cex = 0.8, 
+           box.palette = "GnYlRd"
+           )
+
+
+
+#fancyRpartPlot(tree_fit$fit, palettes=c("Greens", "Reds"))
+
+# prp(tree_fit$fit,
+#     faclen=0, #use full names for factor labels
+#     extra=1, #display number of observations for each terminal node
+#     roundint=F, #don't round to integers in output
+#     digits=5)
+
+# Calculate RMSE and R-squared
+# metrics <- metric_set(yardstick::rmse,rsq)
+# 
+# model_performance <- data_test_fh %>%
+#  mutate(predictions = predictions) %>%
+#  metrics(truth = fetal_health, estimate = predictions)
+```
+
+Here is the simplified decision tree logic to arrive at determining if tehre is a severe position:
+
+-   If(abnormal_short_term_variation is \< 60) & (prolonged_decelerations \< .0015) & (fetal_heart_rate \< 129)
+
+-   If(abnormal_short_term_variation is \> 60) & (percentage_of_time_with_abnormal_long_term_variability \< 6.5) & (prolonged_decelerations \> .0015)
+
+-   If(abnormal_short_term_variation is \> 74) & (percentage_of_time_with_abnormal_long_term_variability \< 6.5) & (prolonged_decelerations \< .0015)
+
+-   If(abnormal_short_term_variation is \> 60) & (percentage_of_time_with_abnormal_long_term_variability \< 6.5) & (prolonged_decelerations \< .0015) & (abnormal_short_term_variation is \< 74) & (FHR between 117 and 123)
+
+-   If(abnormal_short_term_variation is \> 60) & (percentage_of_time_with_abnormal_long_term_variability \> 69)
+
+-   If(abnormal_short_term_variation is \> 60 and \<80) & (percentage_of_time_with_abnormal_long_term_variability \> 6.5 and \<69) & (FHR \> 137)
+
+Here is the raw output from the model itself, which some may find more readable:
+
+```{r}
+#tree_fit$fit
+library("partykit")
+
+pathpred <- function(object, ...)
+{
+  ## coerce to "party" object if necessary
+  if(!inherits(object, "party")) object <- as.party(object)
+
+  ## get standard predictions (response/prob) and collect in data frame
+  rval <- data.frame(response = predict(object, type = "response", ...))
+  rval$prob <- predict(object, type = "prob", ...)
+
+  ## get rules for each node
+  rls <- partykit:::.list.rules.party(object)
+
+  ## get predicted node and select corresponding rule
+  rval$rule <- rls[as.character(predict(object, type = "node", ...))]
+
+  return(rval)
+}
+
+rp_pred <- pathpred(tree_fit$fit)
+
+unique_dt_for_3 <- unique(rp_pred %>%  filter(response == "3") %>% select(prob, rule) )
+
+unique_dt_for_3
+
+```
+
+### XGBoost
+
+This section utilizes the XGBoost package as an alternative ensemble technique. XGBoost stands for "Extreme Gradient Boosting" and utilizes decicion trees with gradient boosting, meaning decision trees are constructed sequentially, where each tree tries to correct the errors of the previous trees. It optimizes a loss function by adding trees to the model that reduce this loss and eliminates trees that increases loss. This is a very popular optimization method currently and did yield the best results from this analysis.
+
+```{r xgboost for the data}
+
+
+xgb_healthcare_data <- healthcare_data #%>% select(!starts_with("histogram"))
+
+xgb_healthcare_data$fetal_health <- as.factor(xgb_healthcare_data$fetal_health)
+
+set.seed(912)
+data_split_xgb <- initial_split(dt_healthcare_data, prop = 0.70, strata = fetal_health)
+data_train_xgb <- training(data_split_xgb)
+data_test_xgb <- testing(data_split_xgb)
+
+train_labels = labels(levels(data_train_xgb$fetal_health))
+test_labels = labels(levels(data_test_xgb$fetal_health))
+
+
+# Prepare the data for XGBoost
+train_matrix <- xgb.DMatrix(data = as.matrix(data_train_xgb %>% select(-fetal_health)), 
+                            label = data_train_xgb$fetal_health)
+test_matrix <- xgb.DMatrix(data = as.matrix(data_test_xgb %>% select(-fetal_health)), 
+                           label = data_test_xgb$fetal_health)
+
+
+num_class <- length(unique(train_labels))
+
+# Define the parameters for XGBoost
+params <- list(
+#  booster = "gbtree",
+  objective = "multi:softmax",
+  num_class = num_class + 1,
+  eval_metric = "mlogloss"
+)
+
+watchlist <- list(train = train_matrix, eval = test_matrix)
+
+model <- xgb.train(
+  params = params,
+  data = train_matrix,
+  nrounds = 1000,
+  watchlist = watchlist,
+  early_stopping_rounds = 10,
+  print_every_n = 10,
+  verbose = 0
+)
+
+preds <- predict(model, newdata = test_matrix)
+
+data_test_xgb$pred_xgb <- preds
+
+xgb_tab_test <- table(Actual = data_test_xgb$fetal_health, Predicted = data_test_xgb$pred_xgb)
+
+accuracy <- sum(preds == data_test_xgb$fetal_health) / length(data_test_xgb$fetal_health)
+
+#print(paste("Accuracy:", round(accuracy,4) ) )
+
+#sum(diag(xgb_tab_test))/sum(xgb_tab_test)
+
+
+```
+
+The accuracy of this model is `r accuracy`
+
+Additional visualizations of the XGBoost here:
+
+```{r}
+
+# Feature importance plot
+importance_matrix <- xgb.importance(model = model)
+xgb.plot.importance(importance_matrix)
+
+# Tree plot
+#xgb.plot.tree(model = model)
+
+
+# Evaluation log plot
+evaluation_log <- model$evaluation_log
+
+plot(evaluation_log$iter, evaluation_log$train_mlogloss, type = "l", col = "blue", ylim = range(c(evaluation_log$train_mlogloss, evaluation_log$eval_mlogloss)), xlab = "Iteration", ylab = "Log Loss")
+lines(evaluation_log$iter, evaluation_log$eval_mlogloss, col = "red")
+legend("topright", legend = c("Train", "Test"), col = c("blue", "red"), lty = 1)
+
+```
+
+Let's remove the historical data, as it may be over fitting the model
+
+```{r XGBoost Simpler}
+
+
+xgb_healthcare_data <- healthcare_data %>% select(!starts_with("histogram"))
+
+
+xgb_healthcare_data$fetal_health <- as.factor(xgb_healthcare_data$fetal_health)
+
+set.seed(5202)
+data_split_xgb <- initial_split(xgb_healthcare_data, prop = 0.70, strata = fetal_health)
+data_train_xgb <- training(data_split_xgb)
+data_test_xgb <- testing(data_split_xgb)
+
+train_labels = labels(levels(data_train_xgb$fetal_health))
+test_labels = labels(levels(data_test_xgb$fetal_health))
+
+
+# Prepare the data for XGBoost
+train_matrix <- xgb.DMatrix(data = as.matrix(data_train_xgb %>% select(-fetal_health)), 
+                            label = data_train_xgb$fetal_health)
+test_matrix <- xgb.DMatrix(data = as.matrix(data_test_xgb %>% select(-fetal_health)), 
+                           label = data_test_xgb$fetal_health)
+
+
+num_class <- length(unique(train_labels))
+
+# Define the parameters for XGBoost
+params <- list(
+#  booster = "gbtree",
+  objective = "multi:softmax",
+  num_class = num_class + 1,
+  eval_metric = "mlogloss"
+)
+
+watchlist <- list(train = train_matrix, eval = test_matrix)
+
+model <- xgb.train(
+  params = params,
+  data = train_matrix,
+  nrounds = 100,
+  watchlist = watchlist,
+  early_stopping_rounds = 10,
+  print_every_n = 10,
+  verbose = 0
+)
+
+preds <- predict(model, newdata = test_matrix)
+
+data_test_xgb$pred_xgb <- preds
+
+xgb_tab_test <- table(Actual = data_test_xgb$fetal_health, Predicted = data_test_xgb$pred_xgb)
+
+accuracy <- sum(preds == data_test_xgb$fetal_health) / length(data_test_xgb$fetal_health)
+
+#print(paste("Accuracy:", round(accuracy,4) ) )
+
+#sum(diag(xgb_tab_test))/sum(xgb_tab_test)
+
+
+```
+
+The accuracy of this model is also high at `r accuracy` This is a good model due to fewer factors for potentially covariant variables.
+
+Here is visualization of this more parsimonious model:
+
+```{r}
+# Feature importance plot
+importance_matrix <- xgb.importance(model = model)
+xgb.plot.importance(importance_matrix)
+
+# Tree plot
+#xgb.plot.tree(model = model)
+
+
+# Evaluation log plot
+evaluation_log <- model$evaluation_log
+
+plot(evaluation_log$iter, evaluation_log$train_mlogloss, type = "l", col = "blue", ylim = range(c(evaluation_log$train_mlogloss, evaluation_log$eval_mlogloss)), xlab = "Iteration", ylab = "Log Loss")
+lines(evaluation_log$iter, evaluation_log$eval_mlogloss, col = "red")
+legend("topright", legend = c("Train", "Test"), col = c("blue", "red"), lty = 1)
+
+
+```
+
+### Principal Component Analysis (PCA)
+
+This section will evaluate the principal components in the data set. PCA is a method to reduce dimensionality (fewer predictor variables) in the data set by organizing one or more covaried predictors into "factors" that are linear combinations of the original variables. Factors or sorted by the maximum variation they explain in the data. It utilizes a covariance matrix to understand the relationship between variables, similar to the correlation matrix earlier in this document. The net of this is that most important variables that explain the data and that are uncorrelated are identified and can be used for a better, more stable analysis. The downside is that it does require more interpretation and complexity in the explanatory aspect of the model.
 
 ```{r PCA}
 
@@ -675,33 +1196,33 @@ pca_clean_healthcare_data <- clean_healthcare_data %>%
 # Perform PCA
 pca_result <- prcomp(pca_clean_healthcare_data)
 
-summary(pca_result)
+#summary(pca_result)
 
 biplot(pca_result)
 
 plot(pca_result,type="l")
 
-# Extract factor loadings and loadings of observed variables
-factor_loadings <- pca_result$loadings
-observed_loadings <- factor_loadings[, 1]
-
-# Create a new dataset with the principal component as the observed variable
-pca_data <- as.data.frame(pca_result$scores[, 1])
-
-head(pca_data)
-
-pca_clean_healthcare_data_agg <- clean_healthcare_data %>% 
-  select(!starts_with("histogram")) %>%
-  select(!fetal_health) %>% 
-
-# Perform PCA
-pca_result <- prcomp(pca_clean_healthcare_data)
-
-summary(pca_result)
-
-biplot(pca_result)
-
-plot(pca_result,type="l")
+# # Extract factor loadings and loadings of observed variables
+# factor_loadings <- pca_result$loadings
+# observed_loadings <- factor_loadings[, 1]
+# 
+# # Create a new dataset with the principal component as the observed variable
+# pca_data <- as.data.frame(pca_result$scores[, 1])
+# 
+# #head(pca_data)
+# 
+# pca_clean_healthcare_data_agg <- clean_healthcare_data %>% 
+#   select(!starts_with("histogram")) %>%
+#   select(!fetal_health) 
+# 
+# # Perform PCA
+# pca_result <- prcomp(pca_clean_healthcare_data)
+# 
+# #summary(pca_result)
+# 
+# biplot(pca_result) 
+# 
+# plot(pca_result,type="l")
 
 
 ```

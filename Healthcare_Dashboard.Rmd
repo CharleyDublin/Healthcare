@@ -1,21 +1,54 @@
 ---
-title: "Health Care Analysis"
+title: "Health Care Outcome Analysis"
 output: 
   flexdashboard::flex_dashboard:
-    theme:
-      bg: "#101010"
-      fg: "#FDF7F7" 
-      primary: "#ED79F9"
-      base_font:
-        google: Prompt
-      code_font:
-        google: JetBrains Mono
     orientation: columns
     vertical_layout: fill
+    theme: cosmo
+    logo: TorchLight_Marketing_Logo_Small2.png
 ---
 
-```{r setup, include=FALSE}
+<style>                     
+.navbar {
+  background-color:#003D79;
+  border-color:white;
+}
+.navbar-brand {
+color:white!important;
+}
+</style>   
+
+<style type="text/css">
+
+.chart-title {  /* chart_title  */
+   font-size: 15px
+
+</style>
+
+
+```{r setup}
 library(flexdashboard)
+library(tidyverse)
+library(RedditExtractoR)
+library(kableExtra)
+library(tidytext)
+library(datapasta)
+
+library(syuzhet)
+library(lubridate)
+library(ggplot2)
+library(scales)
+library(reshape2)
+library(dplyr)
+
+My_Theme_Horizontal = theme(
+  axis.text.x = element_text(color = "grey20", size = 6, angle = 90, hjust = .5, vjust = .5, face = "plain"),
+  axis.text.y = element_text(color = "grey20", size = 6, angle = 0, hjust = 1, vjust = 0, face = "plain"),  
+  axis.title.x = element_text(color = "grey20", size = 8, angle = 0, hjust = .5, vjust = 0, face = "bold"),
+  axis.title.y = element_text(color = "grey20", size = 8, angle = 90, hjust = .5, vjust = .5, face = "bold")
+)
+
+
 # Install thematic and un-comment for themed static plots (i.e., ggplot2)
 # thematic::thematic_rmd()
 ```
